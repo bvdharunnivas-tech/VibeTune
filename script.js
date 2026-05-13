@@ -2651,12 +2651,20 @@ function playSong(index) {
         isPlaying = false; // Reset state before loading
         updatePlayPauseIcon();
 
-        // Encode the URL manually for GitHub Pages compatibility
-        // Only encode if it's a local path with spaces
+        // Encode the URL for GitHub Pages compatibility
         let url = song.url;
         if (!url.startsWith('http')) {
-            // Encode spaces and special characters, but keep the folder structure
-            url = url.split('/').map(part => encodeURIComponent(part)).join('/');
+            // Encode the path parts (handling spaces and special characters)
+            const encodedPath = url.split('/').map(part => encodeURIComponent(part)).join('/');
+            
+            // Use URL constructor to ensure correct resolution relative to the current page
+            // This handles the "missing trailing slash" issue on GitHub Pages (e.g., /VibeTune vs /VibeTune/)
+            try {
+                url = new URL(encodedPath, window.location.href).href;
+            } catch (e) {
+                console.error("URL construction failed", e);
+                url = encodedPath;
+            }
         }
         
         audio.src = url;
