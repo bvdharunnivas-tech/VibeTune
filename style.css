@@ -164,6 +164,11 @@ body {
     cursor: pointer;
 }
 
+.arrow-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
 .search-container {
     background-color: var(--text-white);
     border-radius: 500px;
@@ -206,6 +211,7 @@ body {
 
 .premium-btn:hover {
     transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .install-btn {
@@ -337,6 +343,7 @@ body {
 .song-card:hover .play-hover-btn {
     opacity: 1;
     transform: translateY(0);
+    box-shadow: 0 0 20px var(--spotify-green);
 }
 
 /* Player Bar */
@@ -418,6 +425,7 @@ body {
 
 .play-btn:hover {
     transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 .progress-container {
@@ -739,6 +747,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 .fp-play-btn:hover {
     transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 .fp-close {

@@ -2421,6 +2421,27 @@ const songs = [
         "url":  "songs/Yethi Yethi.mp3",
         "id":  343,
         "cover":  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop"
+    },
+    {
+        "artist":  "Vijay",
+        "title":  "Thalapathy Kacheri",
+        "url":  "songs/Thalapathy Kacheri.mp3",
+        "id":  344,
+        "cover":  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop"
+    },
+    {
+        "artist":  "Anirudh Ravichander",
+        "title":  "Thee Thalapathy",
+        "url":  "songs/Thee Thalapathy.mp3",
+        "id":  345,
+        "cover":  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop"
+    },
+    {
+        "artist":  "Vijay",
+        "title":  "Unga Vijay, Na Varen",
+        "url":  "songs/Unga Vijay, Na Varen.mp3",
+        "id":  346,
+        "cover":  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&h=500&fit=crop"
     }
 ];
 
@@ -2611,10 +2632,19 @@ function playSong(index) {
     currentSongIndex = index;
     const song = songs[index];
     if (audio && song) {
-        audio.src = song.url;
-        audio.play().catch(e => console.error("Error playing audio", e));
-        isPlaying = true;
-        updatePlayerUI();
+        // Encode URL to handle spaces and special characters
+        const encodedUrl = song.url.startsWith('http') ? song.url : encodeURI(song.url);
+        audio.src = encodedUrl;
+        
+        audio.play().then(() => {
+            isPlaying = true;
+            updatePlayerUI();
+        }).catch(e => {
+            console.error("Error playing audio:", e);
+            isPlaying = false;
+            updatePlayPauseIcon();
+            // Optional: alert(Failed to play song: ${song.title});
+        });
     }
 }
 
