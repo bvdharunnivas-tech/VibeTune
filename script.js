@@ -2464,6 +2464,21 @@ try {
 }
 
 const audio = document.getElementById('audio-player');
+if (audio) {
+    audio.onerror = function() {
+        const error = audio.error;
+        let msg = "Unknown audio error";
+        if (error) {
+            switch (error.code) {
+                case 1: msg = "Aborted"; break;
+                case 2: msg = "Network error"; break;
+                case 3: msg = "Decoding error"; break;
+                case 4: msg = "Source not supported (check file path)"; break;
+            }
+        }
+        console.error("Audio Error:", msg, audio.src);
+    };
+}
 const songGrid = document.getElementById('song-grid');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const prevBtn = document.getElementById('prev-btn');
@@ -2624,7 +2639,6 @@ function setActiveNav(element) {
 function playSong(index) {
     if (index === -1) return;
     
-    // If it's the same song, just toggle play
     if (index === currentSongIndex) {
         togglePlay();
         return;
@@ -2634,14 +2648,21 @@ function playSong(index) {
     const song = songs[index];
     
     if (audio && song) {
-        // Reset current time and update source
-        audio.currentTime = 0;
-        audio.src = song.url; 
+        isPlaying = false; // Reset state before loading
+        updatePlayPauseIcon();
+
+        // Encode the URL manually for GitHub Pages compatibility
+        // Only encode if it's a local path with spaces
+        let url = song.url;
+        if (!url.startsWith('http')) {
+            // Encode spaces and special characters, but keep the folder structure
+            url = url.split('/').map(part => encodeURIComponent(part)).join('/');
+        }
         
-        // Load and play
+        audio.src = url;
         audio.load();
-        const playPromise = audio.play();
         
+        const playPromise = audio.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 isPlaying = true;
