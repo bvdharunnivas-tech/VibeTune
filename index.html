@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeTune - Music for everyone</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <img src="vibetune-logo.png" alt="VibeTune Logo" class="splash-logo">
+            <h1 id="splash-greeting">Good Evening, VibeTune</h1>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="vibetune-logo.png" alt="VibeTune Logo" class="app-logo">
+                <span>VibeTune</span>
+            </div>
+            
+            <nav class="side-nav">
+                <ul>
+                    <li class="active" id="home-nav"><i data-lucide="home"></i> Home</li>
+                    <li id="search-nav"><i data-lucide="search"></i> Search</li>
+                    <li id="library-nav"><i data-lucide="library"></i> Your Library</li>
+                </ul>
+            </nav>
+
+            <div class="playlists-section">
+                <h3>Playlists</h3>
+                <div class="playlist-actions">
+                    <button class="action-btn" id="create-playlist-btn"><i data-lucide="plus-square"></i> Create Playlist</button>
+                    <button class="action-btn" id="liked-songs-btn"><i data-lucide="heart"></i> Liked Songs</button>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="#">Cookies</a>
+                <a href="#">Privacy</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="nav-arrows">
+                    <button class="arrow-btn"><i data-lucide="chevron-left"></i></button>
+                    <button class="arrow-btn"><i data-lucide="chevron-right"></i></button>
+                </div>
+                
+                <div class="search-container hidden" id="search-bar-container">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="search-input" placeholder="What do you want to listen to?">
+                </div>
+
+                <div class="user-actions">
+                    <button class="premium-btn">Explore Premium</button>
+                    <button class="install-btn"><i data-lucide="arrow-down-circle"></i> Install App</button>
+                    <button class="profile-btn" id="profile-btn"><i data-lucide="user"></i></button>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <section class="hero-section" id="hero-section">
+                    <div class="hero-content">
+                        <h1>Peaceful Piano</h1>
+                        <p>Relax and indulge with beautiful piano pieces</p>
+                    </div>
+                </section>
+
+                <section class="songs-section">
+                    <div class="section-header">
+                        <h2 id="section-title">Spotify Playlists</h2>
+                        <span class="show-all">Show all</span>
+                    </div>
+                    <div class="song-grid" id="song-grid">
+                        <!-- Songs will be injected here by JavaScript -->
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Player -->
+        <footer class="player-bar">
+            <div class="current-track">
+                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&h=100&fit=crop" alt="Track Cover" id="player-cover">
+                <div class="track-info">
+                    <h4 id="player-title">Select a song</h4>
+                    <p id="player-artist">Artist Name</p>
+                </div>
+                <button class="like-btn"><i data-lucide="heart"></i></button>
+            </div>
+
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="secondary-btn"><i data-lucide="shuffle"></i></button>
+                    <button class="secondary-btn" id="prev-btn" title="Previous"><i data-lucide="skip-back"></i></button>
+                    <button class="secondary-btn" id="rewind-btn" title="Back 10s"><i data-lucide="rotate-ccw"></i></button>
+                    <button class="play-btn" id="play-pause-btn"><i data-lucide="play" fill="black"></i></button>
+                    <button class="secondary-btn" id="forward-btn" title="Forward 10s"><i data-lucide="rotate-cw"></i></button>
+                    <button class="secondary-btn" id="next-btn" title="Next"><i data-lucide="skip-forward"></i></button>
+                    <button class="secondary-btn"><i data-lucide="repeat"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span id="current-time">0:00</span>
+                    <div class="progress-bar-wrapper">
+                        <input type="range" id="progress-bar" min="0" max="100" value="0">
+                    </div>
+                    <span id="total-duration">0:00</span>
+                </div>
+            </div>
+
+            <div class="volume-controls">
+                <button class="secondary-btn"><i data-lucide="mic-2"></i></button>
+                <button class="secondary-btn"><i data-lucide="list-music"></i></button>
+                <button class="secondary-btn"><i data-lucide="monitor-speaker"></i></button>
+                <i data-lucide="volume-2"></i>
+                <div class="volume-bar-wrapper">
+                    <input type="range" id="volume-bar" min="0" max="100" value="70">
+                </div>
+                <button class="secondary-btn"><i data-lucide="maximize-2"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <audio id="audio-player"></audio>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="playlist-modal" class="modal hidden">
+            <div class="modal-header">
+                <h2>Create Playlist</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="playlist-name-input" placeholder="My Playlist #1">
+                <button class="save-btn" id="save-playlist-btn">Create</button>
+            </div>
+        </div>
+
+        <div id="account-modal" class="modal hidden">
+            <div class="modal-header">
+                <h2>Account Settings</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="account-info">
+                    <div class="profile-pic">
+                        <i data-lucide="user"></i>
+                    </div>
+                    <div class="profile-details">
+                        <h3>Antigravity User</h3>
+                        <p>Premium Individual</p>
+                    </div>
+                </div>
+                <div class="account-links">
+                    <button class="account-link-btn">Edit Profile</button>
+                    <button class="account-link-btn">Privacy Settings</button>
+                    <button class="account-link-btn logout">Log Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Mini Player -->
+    <div id="floating-player" class="floating-player hidden">
+        <div class="fp-info">
+            <img src="" alt="" id="fp-cover">
+            <div class="fp-text">
+                <h4 id="fp-title">Song Title</h4>
+                <p id="fp-artist">Artist Name</p>
+            </div>
+        </div>
+        <div class="fp-controls">
+            <button class="fp-btn" id="fp-prev-btn"><i data-lucide="skip-back"></i></button>
+            <button class="fp-btn" id="fp-rewind-btn"><i data-lucide="rotate-ccw"></i></button>
+            <button class="fp-play-btn" id="fp-play-pause-btn"><i data-lucide="play" fill="black"></i></button>
+            <button class="fp-btn" id="fp-forward-btn"><i data-lucide="rotate-cw"></i></button>
+            <button class="fp-btn" id="fp-next-btn"><i data-lucide="skip-forward"></i></button>
+        </div>
+        <button class="fp-close" id="fp-close-btn">&times;</button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
