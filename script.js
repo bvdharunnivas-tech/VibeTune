@@ -2623,28 +2623,35 @@ function setActiveNav(element) {
 // Player Functions
 function playSong(index) {
     if (index === -1) return;
+    
+    // If it's the same song, just toggle play
     if (index === currentSongIndex) {
         togglePlay();
-        if (floatingPlayer) floatingPlayer.classList.remove('hidden');
         return;
     }
     
     currentSongIndex = index;
     const song = songs[index];
+    
     if (audio && song) {
-        // Encode URL to handle spaces and special characters
-        const encodedUrl = song.url.startsWith('http') ? song.url : encodeURI(song.url);
-        audio.src = encodedUrl;
+        // Reset current time and update source
+        audio.currentTime = 0;
+        audio.src = song.url; 
         
-        audio.play().then(() => {
-            isPlaying = true;
-            updatePlayerUI();
-        }).catch(e => {
-            console.error("Error playing audio:", e);
-            isPlaying = false;
-            updatePlayPauseIcon();
-            // Optional: alert(Failed to play song: ${song.title});
-        });
+        // Load and play
+        audio.load();
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isPlaying = true;
+                updatePlayerUI();
+            }).catch(error => {
+                console.error("Playback failed:", error);
+                isPlaying = false;
+                updatePlayPauseIcon();
+            });
+        }
     }
 }
 
@@ -2658,11 +2665,20 @@ function togglePlay() {
         if (isPlaying) {
             audio.pause();
             isPlaying = false;
+            updatePlayPauseIcon();
         } else {
-            audio.play().catch(e => console.error("Error playing audio", e));
-            isPlaying = true;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    updatePlayPauseIcon();
+                }).catch(error => {
+                    console.error("Toggle playback failed:", error);
+                    isPlaying = false;
+                    updatePlayPauseIcon();
+                });
+            }
         }
-        updatePlayPauseIcon();
     }
 }
 
