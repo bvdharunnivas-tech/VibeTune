@@ -1,3 +1,7 @@
+let isShuffle = false;
+let isRepeat = false;
+let shuffledQueue = [];
+
 const songs = [
     {
         "artist":  "Royalty Free",
@@ -2464,21 +2468,17 @@ try {
 }
 
 const audio = document.getElementById('audio-player');
-if (audio) {
-    audio.onerror = function() {
-        const error = audio.error;
-        let msg = "Unknown audio error";
-        if (error) {
-            switch (error.code) {
-                case 1: msg = "Aborted"; break;
-                case 2: msg = "Network error"; break;
-                case 3: msg = "Decoding error"; break;
-                case 4: msg = "Source not supported (check file path)"; break;
-            }
-        }
-        console.error("Audio Error:", msg, audio.src);
-    };
-}
+    if (audio) {
+        audio.onerror = function() {
+            console.error(`Failed to load track: ${songs[currentSongIndex]?.title}. Skipping...`);
+            // Wait 1 second before skipping so we don't cause an infinite loop if ALL songs are broken
+            setTimeout(() => {
+                let nextIndex = currentSongIndex + 1;
+                if (nextIndex >= songs.length) nextIndex = 0;
+                playSong(nextIndex);
+            }, 1000);
+        };
+    }
 const songGrid = document.getElementById('song-grid');
 const playPauseBtn = document.getElementById('play-pause-btn');
 const prevBtn = document.getElementById('prev-btn');
@@ -2648,24 +2648,41 @@ function playSong(index) {
     const song = songs[index];
     
     if (audio && song) {
-        isPlaying = false; // Reset state before loading
+        isPlaying = false;
         updatePlayPauseIcon();
+
+        // Robust URL resolution
+        let url = song.url;
+        if (!url.startsWith('http')) {
+            // Ensure the path starts with a slash so it resolves from the domain root
+            const cleanPath = url.startsWith('/') ? url : '/' + url;
+            url = window.location.origin + cleanPath;
+        }
+        
+        audio.src = url;
+        audio.load();
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isPlaying = true;
+                updatePlayerUI();
+            }).catch(error => {
+                console.warn("Playback prevented or failed:", error);
+                isPlaying = false;
+                updatePlayPauseIcon();
+                // If it fails immediately (like a 404), trigger the error handler below
+            });
+        }
+    }
+}
 
         // Encode the URL for GitHub Pages compatibility
         let url = song.url;
-        if (!url.startsWith('http')) {
-            // Encode the path parts (handling spaces and special characters)
-            const encodedPath = url.split('/').map(part => encodeURIComponent(part)).join('/');
-            
-            // Use URL constructor to ensure correct resolution relative to the current page
-            // This handles the "missing trailing slash" issue on GitHub Pages (e.g., /VibeTune vs /VibeTune/)
-            try {
-                url = new URL(encodedPath, window.location.href).href;
-            } catch (e) {
-                console.error("URL construction failed", e);
-                url = encodedPath;
-            }
-        }
+
+if (!url.startsWith("http")) {
+    url = new URL(encodeURI(url), window.location.href).href;
+}
         
         audio.src = url;
         audio.load();
@@ -2681,8 +2698,6 @@ function playSong(index) {
                 updatePlayPauseIcon();
             });
         }
-    }
-}
 
 function togglePlay() {
     if (currentSongIndex === -1) {
@@ -2875,12 +2890,26 @@ if (searchInput) {
 // Controls
 if (playPauseBtn) playPauseBtn.addEventListener('click', togglePlay);
 
-if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-        let nextIndex = currentSongIndex + 1;
+function playNextSong() {
+    if (isRepeat && audio) {
+        // If repeat is on, just replay current track
+        audio.currentTime = 0;
+        audio.play();
+        return;
+    }
+
+    let nextIndex;
+    if (isShuffle) {
+        // Pick a random song that isn't the current one
+        do {
+            nextIndex = Math.floor(Math.random() * songs.length);
+        } while (nextIndex === currentSongIndex && songs.length > 1);
+    } else {
+        nextIndex = currentSongIndex + 1;
         if (nextIndex >= songs.length) nextIndex = 0;
-        playSong(nextIndex);
-    });
+    }
+    
+    playSong(nextIndex);
 }
 
 if (prevBtn) {
